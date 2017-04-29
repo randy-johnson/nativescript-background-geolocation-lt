@@ -9,6 +9,23 @@ This repo hosts the **iOS** platform available in the **[Premium Version](http:/
 ![Home](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-iphone5-geofences-framed-README.png)
 ![Settings](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-iphone5-settings-framed-README.png)
 
+## [:books: API Documentation](./docs/README.md)
+- :wrench: [Configuration Options](./docs/README.md#wrench-configuration-options)
+  + [Geolocation Options](./docs/README.md#wrench-geolocation-options)
+  + [Activity Recognition Options](./docs/README.md#wrench-activity-recognition-options)
+  + [HTTP & Persistence Options](./docs/README.md#wrench-http--persistence-options)
+  + [Geofencing Options](./docs/README.md#wrench-geofencing-options)
+  + [Application Options](./docs/README.md#wrench-application-options)
+- :zap: [Events](./docs/README.md#zap-events)
+- :small_blue_diamond: [Methods](./docs/README.md#large_blue_diamond-methods)
+- :blue_book: Guides
+  + [Philosophy of Operation](../../wiki/Philosophy-of-Operation)
+  + [Geofencing](./docs/geofencing.md)
+  + [HTTP Features](./docs/http.md)
+  + [Location Data Schema](../../wiki/Location-Data-Schema)
+  + [Debugging](../../wiki/Debugging)
+
+
 ## Installing the plugin ##
 
 #### From npm 
@@ -84,6 +101,20 @@ This is because your app hasn't loaded the ios platform-declarations.  You can e
 }
 ```
 
+## Android Setup (Premium Users)
+
+A [License](http://www.transistorsoft.com/shop/products/nativescript-background-geolocation)) is required to unlock Android.
+
+Edit the file **`app/App_Resources/Android/App_Resources/AndroidManifest.xml`**.  Copy the following `<meta-data />` tag containing your **YOUR LICENSE KEY** within the `<application>` element:
+
+```diff
+<manifest>
+  <application>
++    <meta-data android:name="com.transistorsoft.locationmanager.license" android:value="YOUR LICENSE KEY" />
+  </application>
+</manifest>
+```
+
 ## Demo app
 
 The plugin hosts its own demo app in the `/demo` folder.  Install it like this:
@@ -106,16 +137,6 @@ Simulating the location with `City Drive` works well:
 ```Javascript
 import {BackgroundGeolocation} from "nativescript-background-geolocation-lt";
 ```
-
-
-## Documentation
-- [API Documentation](docs)
-- [Advanced Geofencing](docs/geofencing.md)
-- [Location Data Schema](../../wiki/Location-Data-Schema)
-- [Error Codes](../../wiki/Location-Error-Codes)
-- [Debugging Sounds](../../wiki/Debug-Sounds)
-- [Geofence Features](../../wiki/Geofence-Features)
-- [Background Tasks](../../wiki/Background-Tasks)
 
 ## Example
 
@@ -176,29 +197,6 @@ A simple Node-based [web-application](https://github.com/transistorsoft/backgrou
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/background-geolocation-console-grid.png)
 
-## Behaviour
-
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  
-
-iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) 
-
-Android automatically detects when the device is moving so has no need for a stationary-geofence.
-
-The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method.  Both iOS & Android use a SQLite database to persist **every** recorded geolocation so you don't have to worry about persistence when no network is detected.  The plugin provides a Javascript API to fetch and destroy the records in the database.  In addition, the plugin has an optional HTTP layer allowing allowing you to automatically HTTP POST recorded geolocations to your server.
-
-The function `changePace(isMoving, success, failure)` is provided to force the plugin to enter "moving" or "stationary" state.
-
-## iOS
-
-The plugin uses iOS Significant Changes API, and starts triggering your configured `callback` only when a cell-tower switch is detected (i.e. the device exits stationary radius). 
-
-When the plugin detects the device has moved beyond its configured #stationaryRadius, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
-
-  `(round(speed, 5))^2 + distanceFilter`
-
-## Android
-
-Using the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) provided by [Google Play Services](https://developer.android.com/google/play-services/index.html), Android will constantly monitor [the nature](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html) of the device's movement at a sampling-rate configured by `#activityRecognitionInterval`.  When the plugin sees a DetectedActivity of [STILL](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html), location-updates will be halted -- when it sees `IN_VEHICLE, ON_BICYCLE, ON_FOOT, RUNNING, WALKING`, location-updates will be initiated.
 
 ## Licence ##
 ```

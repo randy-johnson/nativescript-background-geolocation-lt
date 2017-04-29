@@ -1,4 +1,42 @@
 # Change Log
+## [1.6.0] - 2017-04-25
+- [Changed] iOS minimum version is now `8.4`.  Plugin will log an error when used on versions of iOS that don't implement the method `CLLocationManager#requestLocation`
+- [Fixed] iOS bug executing `#setConfig` multiple times too quickly can crash the plugin when multiple threads attempt to modify an `NSMutableDictionary`
+- [Fixed] Android was rounding `battery_level` to 1 decimal place.
+- [Fixed] iOS geofences-only mode was not using significant-location-change events to evaluate geofences within proximity.
+- [Changed] iOS now uses `CLLocationManager requestLocation` to request the `motionchange` position, rather than counting samples.  This is a more robust way to get a single location
+- [Fixed] iOS crash when providing `null` values in `Object` config options (ie: `#extras`, `#params`, `#headers`, etc)
+- [Added] New config option `locationsOrderDirection [ASC|DESC]` for controlling the order that locations are selected from the database (and synced to your server).  Defaults to `ASC`.
+- [Added] Support for iOS geofence `DWELL` transitions.
+- [Changed] Updated **proguard config** to ignore `com.transistorsoft.**` -- `tslocationmanager.aar` is *already* pro-guarded.
+- [Fixed] iOS bug when composing geofence data for peristence.  Sometimes it appended a `location.geofence.location` due to a shared `NSDictionary`
+- [Fixed] Android issue with applying default settings the first time an app boots.  If you execute `#getState` before `#configure` is called, `#getState` would return an empty `{}`.
+- [Changed] The licensing model of Android now enforces license only for **release** builds.  If an invalid license is configured while runningin **debug** mode, a Toast warning will appear **"BackgroundGeolocation is running in evaluation mode."**, but the plugin *will* work.
+- [Fixed] iOS bug with HTTP `401` handling.
+- [Added] The Android plugin now broadcasts all its events using the Android `BroadcastReceiver` mechanism.  You're free to implement your own native Android handler to receive and react to these events as you wish.
+
+## [1.5.0] - 2017-03-01
+- [Changed] Refactor iOS / Android Settings management
+- [Fixed] Android sqlite migration issue; when upgrading from very old version -> latest, the "geofences" table migration could be skipped.
+- [Fixed] `#emailLog` now works.
+- [Added] HTTP JSON template features.  See [HTTP Features](./docs/http.md).  You can now template your entire JSON request data sent to the server by the plugin's HTTP layer.
+- [Changed] **ANDROID BREAKING** `license` is no longer provided to `#configure` -- You will now add it to your `app/App_Resources/Android/AndroidManifest.xml` (see [README](README.md) for details):
+
+```diff
+<manifest>
+  <application>
++    <meta-data android:name="com.transistorsoft.locationmanager.license" android:value="YOUR LICENSE KEY" />
+  </application>
+</manifest>
+```
+
+- [Fixed] Migrate Android `providerchange` mechanism out of the `Service` (which only runs when the plugin is `#start`ed) to a place where it will be monitored all the time, regardless if the plugin is enabled or not.
+- [Fixed] Catch `IllegalStateException` reported when using `#getLog`
+- [Changed] With new Android "Doze-mode", override "idle" on `stopTimeout` and `schedule` alarms
+- [Changed] Tweak iOS accelerometer-only motion-detection system.
+- [Fixed] Location-authorization alert being popped up after a `suspend` event because the plugin always attempts to ensure it has a stationary-region here.  Simply check current authorization-status is not == `Denied`.
+- [Fixed] iOS Location Authorization alert is shown multiple time.  Also discovered a bug where the `providerchange` `enabled` value was calculated based upon hard-coded `Always` where it should have compared to the configured `locationAuthorizationRequest`.
+- [Added] If plugin's `#stop` method is called, the Location Authorization Alert will be hidden (if currently visible).
 
 ## [1.4.0]
 - [Fixed] Locale issue when rounding location float attributes (eg: `speed`, `heading`, `odometer`)
