@@ -169,6 +169,7 @@ export class BackgroundGeolocation extends AbstractBackgroundGeolocation {
 
   public static getCurrentPosition(success: Function, failure?:Function, options?:Object) {
     failure = failure || emptyFn;
+    options = options || {};
     var callback = new Callback({
       success: function(location:org.json.JSONObject) {
         success(JSON.parse(location.toString()));
@@ -402,6 +403,20 @@ export class BackgroundGeolocation extends AbstractBackgroundGeolocation {
       }
     });
     this.getAdapter().getLog(callback);
+  }
+
+  public static emailLog(email:string, success?:Function, failure?:Function) {
+    success = success || emptyFn;
+    failure = failure || emptyFn;
+    var callback = new Callback({
+      success: function(result:string) {
+        success(result)
+      },
+      error: function(error:string) {
+        failure(error);
+      }
+    });
+    console.warn('BackgroundGeolocation#emailLog -- NOT IMPLEMENTED');
   }
 
   public static destroyLog(success?:Function, failure?:Function) {
